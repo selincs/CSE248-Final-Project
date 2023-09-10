@@ -28,13 +28,13 @@ public class main {
 
 			for (Row row : sheet) {
 				String cellValue = cellToString(row.getCell(0)); // Assuming ID is in the first column
-				// Check if the first row hasn't been skipped yet and skip it -> Data start
+				//Skip to Data start
 				if (!firstRowSkipped) {
 					firstRowSkipped = true;
 					continue;
 				}
 
-				if (cellValue.equals("—")) {
+				if (cellValue.equals("â€”")) {
 					if (instructor != null) {
 						instructorList.add(instructor);
 					}
