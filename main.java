@@ -1,24 +1,21 @@
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import model.Instructor;
+import model.Name;
+
 import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class main {
 
 	public static void main(String[] args) {
-		List<Instructor> instructorList = new ArrayList<>();
-		
+		// List<Instructor> instructorList = new ArrayList<>();
+		Set<Instructor> instructorSet = new TreeSet<>();
+
 		try (FileInputStream excelFile = new FileInputStream("Instructors.xlsx");
 				Workbook workbook = new XSSFWorkbook(excelFile)) {
 			Sheet sheet = workbook.getSheetAt(0); // Assuming the first sheet
@@ -28,7 +25,7 @@ public class main {
 
 			for (Row row : sheet) {
 				String cellValue = cellToString(row.getCell(0)); // Assuming ID is in the first column
-				//Skip to Data start
+				// Skip to Data start
 				if (!firstRowSkipped) {
 					firstRowSkipped = true;
 					continue;
@@ -36,7 +33,7 @@ public class main {
 
 				if (cellValue.equals("—")) {
 					if (instructor != null) {
-						instructorList.add(instructor);
+						instructorSet.add(instructor);
 					}
 					instructor = new Instructor();
 					rowCount = 0;
@@ -44,8 +41,9 @@ public class main {
 				}
 
 				rowCount++;
-				
-				String[] parts = new String[15]; // Assuming you have 15 columns (A-O)
+
+				String[] parts = new String[15]; // Assuming you have 15 columns (A-O) <-- Can probably be 13 as 14/15
+													// arent important
 				for (int i = 0; i < 15; i++) {
 					parts[i] = cellToString(row.getCell(i));
 				}
@@ -71,13 +69,12 @@ public class main {
 			}
 			// Add the last instructor to the list
 			if (instructor != null) {
-				instructorList.add(instructor);
+				instructorSet.add(instructor);
 			}
-			for (Instructor instructors : instructorList) {
+			for (Instructor instructors : instructorSet) {
 				System.out.println(instructors.toString());
 			}
-		}
-		catch (
+		} catch (
 
 		IOException e) {
 			e.printStackTrace();
@@ -85,40 +82,45 @@ public class main {
 	}
 
 	private static void parseRow1(Instructor instructor, String[] parts) {
-		instructor.setIdNum(parts[0]);
-		instructor.setName(parts[1]);
-		instructor.setHomePhone(parts[2]);
+		instructor.setId(parts[0]);
+		String[] nameParts = parts[1].split(", ");
+		String lastName = nameParts[0];
+		String[] firstAndMiddle = nameParts[1].split(" ");
+		String firstName = firstAndMiddle[0];
+		char middleInitial = (firstAndMiddle.length > 1) ? firstAndMiddle[1].charAt(0) : '\0'; // '\0' represents an
+		instructor.setName(new Name(lastName, firstName, middleInitial));
+//		instructor.setHomePhone(parts[2]);
 		instructor.setRank(parts[3]);
-		instructor.setOnlineCert(parts[4]);
-		instructor.setCampusAvailability(parts[5]);
-		instructor.setSecondCourse(parts[6]);
-		instructor.setNumEves(parts[7]);
-		instructor.setAmDays(parts[8]);
-		instructor.setPmDays(parts[9]);
-		instructor.setSat(parts[10]);
-		instructor.setLateAft(parts[11]);
-		instructor.setEves(parts[12]);
-		//skip Int parts[13] // skip Fall Wrkload parts[14]
+		instructor.setCertifiedOnline(parts[4]);
+		instructor.setPreferredCampuses(parts[5]);
+		instructor.setRequestSecondCourse(parts[6]);
+//		instructor.setNumEves(parts[7]);
+//		instructor.setAmDays(parts[8]);
+//		instructor.setPmDays(parts[9]);
+//		instructor.setSat(parts[10]);
+//		instructor.setLateAft(parts[11]);
+//		instructor.setEves(parts[12]);
+		// skip Int parts[13] // skip Fall Wrkload parts[14]
 	}
 
 	private static void parseRow2(Instructor instructor, String[] parts) {
 		instructor.setHomeCampus(parts[0]);
-		instructor.setAddress(parts[1]);
-		instructor.setStartDate(parts[2]);
-		instructor.setThirdCourse(parts[6]);
-		instructor.setAmMTWTF(parts[8]);
-		instructor.setPmMTWTF(parts[9]);
-		instructor.setSun(parts[10]);
+//		instructor.setAddress(parts[1]);
+//		instructor.setStartDate(parts[2]);
+		instructor.setRequestThirdCourse(parts[6]);
+//		instructor.setAmMTWTF(parts[8]);
+//		instructor.setPmMTWTF(parts[9]);
+///		instructor.setSun(parts[10]);
 	}
 
 	private static void parseRow3(Instructor instructor, String[] parts) {
-		instructor.setBusPhone(parts[0]);
-		instructor.setCityStateZip(parts[1]);
-		instructor.setCourseLoad(parts[2]);
+//		instructor.setBusPhone(parts[0]);
+//		instructor.setCityStateZip(parts[1]);
+		instructor.setCertifiedCourses(parts[2]);
 	}
-	
+
 	private static void parseRow4(Instructor instructor, String[] parts) {
-		instructor.setCourseLoad(instructor.getCourseLoad() + parts[2]);
+		instructor.setCertifiedCourses(parts[2]);
 	}
 
 	private static String cellToString(Cell cell) {
