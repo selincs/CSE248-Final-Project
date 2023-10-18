@@ -3,6 +3,8 @@ package model;
 import java.util.ArrayList;
 
 public class Instructor implements Comparable<Instructor> {
+	//Fix this with rugged array / eNums
+	//Will need to implement a recently taught courses list
 	private final int DAYS = 7;
 	private final int PERIODS = 6;
 

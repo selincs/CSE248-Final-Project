@@ -4,10 +4,6 @@ import model.Instructor;
 import model.InstructorSet;
 import model.Name;
 
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -21,6 +17,7 @@ public class ImportInstructors {
 	public static void importInstructors(String fileName) {
 		instructorSet = InstructorSet.getInstructorSet();
 
+		//This must become fileName eventually
 		try (FileInputStream excelFile = new FileInputStream("Instructors.xlsx");
 				Workbook workbook = new XSSFWorkbook(excelFile)) {
 			Sheet sheet = workbook.getSheetAt(0); // Assuming the first sheet
@@ -29,7 +26,7 @@ public class ImportInstructors {
 			boolean firstRowSkipped = false;
 
 			for (Row row : sheet) {
-				String cellValue = cellToString(row.getCell(0)); // Assuming ID is in the first column
+				String cellValue = cellToString(row.getCell(0)); //Checking for new Instructors
 				// Skip to Data start
 				if (!firstRowSkipped) {
 					firstRowSkipped = true;
@@ -76,13 +73,15 @@ public class ImportInstructors {
 			if (instructor != null) {
 				instructorSet.add(instructor);
 			}
-
+			//	InstructorSet.getSet();
 			for (Instructor instructors : instructorSet.getInstructorSet().getSet()) {
 				System.out.println(instructors.toString());
 			}
-		} catch (
-
-		IOException e) {
+			
+			//Newly added lines
+			workbook.close();
+			excelFile.close();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -103,7 +102,7 @@ public class ImportInstructors {
 //		instructor.setNumEves(parts[7]); Unneeded, delete when okay
 		boolean[][] availabilityData = instructor.getAvailability();
 		parseEarlyAMAvailability(availabilityData, parts[8]);
-		parse3to4PMAvailability(availabilityData, parts[9]); 
+		parse3to4PMAvailability(availabilityData, parts[9]);
 		saturdayAvailability(availabilityData, parts[10]);
 		parseLateAft(availabilityData, parts[11]);
 		parseEves(availabilityData, parts[12]);
@@ -117,7 +116,7 @@ public class ImportInstructors {
 //		instructor.setStartDate(parts[2]);
 		instructor.setRequestThirdCourse(parts[6]);
 		boolean[][] availabilityData = instructor.getAvailability();
-		parseMorningAvailability(availabilityData, parts[8]); 
+		parseMorningAvailability(availabilityData, parts[8]);
 		parseAfternoonAvailability(availabilityData, parts[9]);
 		sundayAvailability(availabilityData, parts[10]);
 		instructor.setAvailability(availabilityData);
@@ -133,8 +132,8 @@ public class ImportInstructors {
 		instructor.setCertifiedCourses(parts[2]);
 	}
 
-	// I can probably find a way to combine all of my parse availability methods now 
-	//Period 1 - 7-8 AM
+	// I can probably find a way to combine all of my parse availability methods now
+	// Period 1 - 7-8 AM
 	private static boolean[][] parseEarlyAMAvailability(boolean[][] availabilityData, String availabilityString) {
 		// Assuming availabilityString is something like "*MTWT"
 		// Iterate through the list of availability strings and update availability
@@ -142,7 +141,7 @@ public class ImportInstructors {
 		if (availabilityString.isEmpty()) {
 			return availabilityData;
 		}
-		
+
 		for (char dayChar : availabilityString.toCharArray()) {
 			switch (dayChar) {
 			case '*':
@@ -179,7 +178,8 @@ public class ImportInstructors {
 		}
 		return availabilityData;
 	}
-	//Period 2 - 8 - 12 AM
+
+	// Period 2 - 8 - 12 AM
 	private static boolean[][] parseMorningAvailability(boolean[][] availabilityData, String availabilityString) {
 		boolean tuesdayPast = false; // Should I make Thursdays char become R?
 		if (availabilityString.isEmpty()) {
@@ -219,172 +219,173 @@ public class ImportInstructors {
 		}
 		return availabilityData;
 	}
-	//Period 3 - 12-3PM
-		private static boolean[][] parseAfternoonAvailability(boolean[][] availabilityData, String availabilityString) {
-			boolean tuesdayPast = false; // Should I make Thursdays char become R?
-			if (availabilityString.isEmpty()) {
-				return availabilityData;
-			}
 
-			for (char dayChar : availabilityString.toCharArray()) {
-				switch (dayChar) {
-				case 'M':
-					// Handle Monday
-					availabilityData[0][2] = true;
-					break;
-				case 'T':
-					// Handle Tuesday or Thursday
-					if (tuesdayPast) {
-						// Handle Thursday
-						availabilityData[3][2] = true;
-					}
-					if (!tuesdayPast) {
-						tuesdayPast = true;
-					}
-					// Handle Tuesday
-					availabilityData[1][2] = true;
-					break;
-				case 'W':
-					// Handle Wednesday
-					if (!tuesdayPast) {
-						tuesdayPast = true;
-					}
-					availabilityData[2][2] = true;
-					break;
-				case 'F':
-					// Handle Friday
-					availabilityData[4][2] = true;
-					break;
-				}
-			}
+	// Period 3 - 12-3PM
+	private static boolean[][] parseAfternoonAvailability(boolean[][] availabilityData, String availabilityString) {
+		boolean tuesdayPast = false; // Should I make Thursdays char become R?
+		if (availabilityString.isEmpty()) {
 			return availabilityData;
 		}
-		
-		// Period 4 - 3-4PM
-		private static boolean[][] parse3to4PMAvailability(boolean[][] availabilityData, String availabilityString) {
-			boolean tuesdayPast = false; // Should I make Thursdays char become R?
-			if (availabilityString.isEmpty()) {
-				return availabilityData;
-			}
 
-			for (char dayChar : availabilityString.toCharArray()) {
-				switch (dayChar) {
-				case '*':
-					// Handle asterisk character
-					break;
-				case 'M':
-					// Handle Monday
-					availabilityData[0][3] = true;
-					break;
-				case 'T':
-					// Handle Tuesday or Thursday
-					if (tuesdayPast) {
-						// Handle Thursday
-						availabilityData[3][3] = true;
-					}
-					if (!tuesdayPast) {
-						tuesdayPast = true;
-					}
-					// Handle Tuesday
-					availabilityData[1][3] = true;
-					break;
-				case 'W':
-					// Handle Wednesday
-					if (!tuesdayPast) {
-						tuesdayPast = true;
-					}
-					availabilityData[2][3] = true;
-					break;
-				case 'F':
-					// Handle Friday
-					availabilityData[4][3] = true;
-					break;
+		for (char dayChar : availabilityString.toCharArray()) {
+			switch (dayChar) {
+			case 'M':
+				// Handle Monday
+				availabilityData[0][2] = true;
+				break;
+			case 'T':
+				// Handle Tuesday or Thursday
+				if (tuesdayPast) {
+					// Handle Thursday
+					availabilityData[3][2] = true;
 				}
+				if (!tuesdayPast) {
+					tuesdayPast = true;
+				}
+				// Handle Tuesday
+				availabilityData[1][2] = true;
+				break;
+			case 'W':
+				// Handle Wednesday
+				if (!tuesdayPast) {
+					tuesdayPast = true;
+				}
+				availabilityData[2][2] = true;
+				break;
+			case 'F':
+				// Handle Friday
+				availabilityData[4][2] = true;
+				break;
 			}
+		}
+		return availabilityData;
+	}
+
+	// Period 4 - 3-4PM
+	private static boolean[][] parse3to4PMAvailability(boolean[][] availabilityData, String availabilityString) {
+		boolean tuesdayPast = false; // Should I make Thursdays char become R?
+		if (availabilityString.isEmpty()) {
 			return availabilityData;
 		}
-		
-		//Period 5 - 4-6PM
-		private static boolean[][] parseLateAft(boolean[][] availabilityData, String availabilityString) {
-			boolean tuesdayPast = false;
-			if (availabilityString.isEmpty()) {
-				return availabilityData;
-			}
 
-			for (char dayChar : availabilityString.toCharArray()) {
-				switch (dayChar) {
-				case 'M':
-					// Handle Monday
-					availabilityData[0][4] = true;
-					break;
-				case 'T':
-					// Handle Tuesday or Thursday
-					if (tuesdayPast) {
-						// Handle Thursday
-						availabilityData[3][4] = true;
-					}
-					if (!tuesdayPast) {
-						tuesdayPast = true;
-					}
-					// Handle Tuesday
-					availabilityData[1][4] = true;
-					break;
-				case 'W':
-					// Handle Wednesday
-					if (!tuesdayPast) {
-						tuesdayPast = true;
-					}
-					availabilityData[2][4] = true;
-					break;
-				case 'F':
-					// Handle Friday
-					availabilityData[4][4] = true;
-					break;
+		for (char dayChar : availabilityString.toCharArray()) {
+			switch (dayChar) {
+			case '*':
+				// Handle asterisk character
+				break;
+			case 'M':
+				// Handle Monday
+				availabilityData[0][3] = true;
+				break;
+			case 'T':
+				// Handle Tuesday or Thursday
+				if (tuesdayPast) {
+					// Handle Thursday
+					availabilityData[3][3] = true;
 				}
+				if (!tuesdayPast) {
+					tuesdayPast = true;
+				}
+				// Handle Tuesday
+				availabilityData[1][3] = true;
+				break;
+			case 'W':
+				// Handle Wednesday
+				if (!tuesdayPast) {
+					tuesdayPast = true;
+				}
+				availabilityData[2][3] = true;
+				break;
+			case 'F':
+				// Handle Friday
+				availabilityData[4][3] = true;
+				break;
 			}
+		}
+		return availabilityData;
+	}
+
+	// Period 5 - 4-6PM
+	private static boolean[][] parseLateAft(boolean[][] availabilityData, String availabilityString) {
+		boolean tuesdayPast = false;
+		if (availabilityString.isEmpty()) {
 			return availabilityData;
 		}
-		
-		// Period 5 - 7-10PM
-		private static boolean[][] parseEves(boolean[][] availabilityData, String availabilityString) {
-			boolean tuesdayPast = false; // Should I make Thursdays char become R?
-			if (availabilityString.isEmpty()) {
-				return availabilityData;
-			}
 
-			for (char dayChar : availabilityString.toCharArray()) {
-				switch (dayChar) {
-				case 'M':
-					// Handle Monday
-					availabilityData[0][5] = true;
-					break;
-				case 'T':
-					// Handle Tuesday or Thursday
-					if (tuesdayPast) {
-						// Handle Thursday
-						availabilityData[3][5] = true;
-					}
-					if (!tuesdayPast) {
-						tuesdayPast = true;
-					}
-					// Handle Tuesday
-					availabilityData[1][5] = true;
-					break;
-				case 'W':
-					// Handle Wednesday
-					if (!tuesdayPast) {
-						tuesdayPast = true;
-					}
-					availabilityData[2][5] = true;
-					break;
-				case 'F':
-					// Handle Friday
-					availabilityData[4][5] = true;
-					break;
+		for (char dayChar : availabilityString.toCharArray()) {
+			switch (dayChar) {
+			case 'M':
+				// Handle Monday
+				availabilityData[0][4] = true;
+				break;
+			case 'T':
+				// Handle Tuesday or Thursday
+				if (tuesdayPast) {
+					// Handle Thursday
+					availabilityData[3][4] = true;
 				}
+				if (!tuesdayPast) {
+					tuesdayPast = true;
+				}
+				// Handle Tuesday
+				availabilityData[1][4] = true;
+				break;
+			case 'W':
+				// Handle Wednesday
+				if (!tuesdayPast) {
+					tuesdayPast = true;
+				}
+				availabilityData[2][4] = true;
+				break;
+			case 'F':
+				// Handle Friday
+				availabilityData[4][4] = true;
+				break;
 			}
+		}
+		return availabilityData;
+	}
+
+	// Period 5 - 7-10PM
+	private static boolean[][] parseEves(boolean[][] availabilityData, String availabilityString) {
+		boolean tuesdayPast = false; // Should I make Thursdays char become R?
+		if (availabilityString.isEmpty()) {
 			return availabilityData;
 		}
+
+		for (char dayChar : availabilityString.toCharArray()) {
+			switch (dayChar) {
+			case 'M':
+				// Handle Monday
+				availabilityData[0][5] = true;
+				break;
+			case 'T':
+				// Handle Tuesday or Thursday
+				if (tuesdayPast) {
+					// Handle Thursday
+					availabilityData[3][5] = true;
+				}
+				if (!tuesdayPast) {
+					tuesdayPast = true;
+				}
+				// Handle Tuesday
+				availabilityData[1][5] = true;
+				break;
+			case 'W':
+				// Handle Wednesday
+				if (!tuesdayPast) {
+					tuesdayPast = true;
+				}
+				availabilityData[2][5] = true;
+				break;
+			case 'F':
+				// Handle Friday
+				availabilityData[4][5] = true;
+				break;
+			}
+		}
+		return availabilityData;
+	}
 
 	private static String cellToString(Cell cell) {
 		if (cell == null) {
