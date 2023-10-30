@@ -9,8 +9,8 @@ public class TimeRangeConverter {
 	 public static TimeRange createTimeRange(String startTimeString, String endTimeString) {
 		 // Validate input strings
 	        if (startTimeString == null || endTimeString == null || startTimeString.isEmpty() || endTimeString.isEmpty()) {
-	            // Find out appropriate validation for empty time string and put here
-	            return null; // Or throw an exception or return a default value
+	            // Unassigned Class Time case
+	            return null;
 	        }
 		 // Define a DateTimeFormatter for parsing time
 	        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("h:mma");

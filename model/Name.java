@@ -13,7 +13,7 @@ public class Name {
 		this.middleInitial = middleInitial;
 		this.lastName = lastName;
 	}
-	
+
 	public Name(String lastName, String firstName) {
 		super();
 		this.firstName = firstName;
@@ -23,10 +23,22 @@ public class Name {
 	public Name() {
 		super();
 	}
-	
+
 	public String getFullName() {
-		return firstName + " " + middleInitial + " " + lastName;
+		if (this.middleInitial == '\0') {
+			return lastName + ", " + firstName;
+		} else {
+			return lastName + ", " + firstName + " " + middleInitial;
+		}
 	}
+	/*
+	 * 		if (this.middleInitial == '\0') {
+			return firstName + " " + lastName;
+		} else {
+			return firstName + " " + middleInitial + " " + lastName;
+		}
+	}
+*/
 
 	public String getFirstName() {
 		return firstName;
@@ -54,7 +66,7 @@ public class Name {
 
 	@Override
 	public String toString() {
-		return "[firstName=" + firstName + ", middleInitial=" + middleInitial+ ", lastName=" + lastName + "]";
+		return "[firstName=" + firstName + ", middleInitial=" + middleInitial + ", lastName=" + lastName + "]";
 	}
 
 	@Override
@@ -66,13 +78,11 @@ public class Name {
 	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
-	    if (obj == null || getClass() != obj.getClass()) {
-	        return false;
-	    }
+		if (obj == null || getClass() != obj.getClass()) {
+			return false;
+		}
 		Name name = (Name) obj;
 		return name.firstName.equalsIgnoreCase(this.firstName);
 	}
-	
-	
 
 }

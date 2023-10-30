@@ -16,8 +16,8 @@ public class SectionSet {
 
 	public Section search(String crn) {
 		if (crn == null || crn.isEmpty()) {
-		//	 throw new IllegalArgumentException("Invalid or empty CRN");
-			System.out.println("Invalid or empty CRN");   
+			// throw new IllegalArgumentException("Invalid or empty CRN");
+			System.out.println("Invalid or empty CRN");
 			return null;
 		}
 
@@ -31,6 +31,14 @@ public class SectionSet {
 
 	public TreeSet<Section> getSections() {
 		return sections;
+	}
+
+	public void displayUnstaffedSections() {
+		for (Section section : sections) {
+			if (section.getAssignedInstructor() == null) {
+				System.out.println(section.toString() + " remains unassigned.");
+			}
+		}
 	}
 
 }

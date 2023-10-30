@@ -1,8 +1,12 @@
 package model;
 
+import java.io.Serializable;
 import java.util.TreeSet;
 
-public class CourseSet {
+import utils.DataPersistence;
+
+public class CourseSet implements Serializable {
+	private static final long serialVersionUID = 2L;
 	private static TreeSet<Course> courses;
 	private static CourseSet courseSet;
 
@@ -12,7 +16,10 @@ public class CourseSet {
 
 	public static synchronized CourseSet getCourseSet() {
 		if (courseSet == null) {
-			courseSet = new CourseSet();
+			courseSet = DataPersistence.deserializeCourseSet();
+			if (courseSet == null) {
+				courseSet = new CourseSet();
+			}
 		}
 		return courseSet;
 	}
@@ -41,6 +48,17 @@ public class CourseSet {
 
 	public static TreeSet<Course> getCourses() {
 		return courses;
+	}
+	
+	public void displayUnstaffedSections() {	//Print? Save to file?
+		for (Course course : courses) {
+			course.getSectionSet().displayUnstaffedSections();
+		}
+	}
+	
+	//readResolve guarantees same hashCode
+	public Object readResolve() { 
+		return courseSet;
 	}
 
 }

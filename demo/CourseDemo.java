@@ -18,6 +18,7 @@ public class CourseDemo {
 		} else {
 		    System.err.println("File not found: CourseInformation.xlsx");
 		}
+	//	CourseSet.getCourseSet().displayUnstaffedSections();
 	}
 
 }

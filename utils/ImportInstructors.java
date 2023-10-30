@@ -13,27 +13,31 @@ import java.io.IOException;
 public class ImportInstructors {
 
 	private static InstructorSet instructorSet;
-
+//	static int count = 0;
 	public static void importInstructors(String fileName) {
 		instructorSet = InstructorSet.getInstructorSet();
 
-		//This must become fileName eventually
-		try (FileInputStream excelFile = new FileInputStream("Instructors.xlsx");
+		//Issue -> I am looping one extra time, throwing an exception as it tries to parse empty strings
+		try (FileInputStream excelFile = new FileInputStream(fileName);
 				Workbook workbook = new XSSFWorkbook(excelFile)) {
 			Sheet sheet = workbook.getSheetAt(0); // Assuming the first sheet
 			Instructor instructor = null;
 			int rowCount = 0;
-			boolean firstRowSkipped = false;
+			boolean getFirstInstructor = false;
 
 			for (Row row : sheet) {
 				String cellValue = cellToString(row.getCell(0)); //Checking for new Instructors
-				// Skip to Data start
-				if (!firstRowSkipped) {
-					firstRowSkipped = true;
-					continue;
+				// Skip to Data start (Only for Instructors V1)
+//				if (!firstRowSkipped) {
+//					firstRowSkipped = true;
+//					continue;
+//				}
+				if (!getFirstInstructor) {
+						getFirstInstructor = true;
+						instructor = new Instructor();
 				}
 
-				if (cellValue.equals("—")) {
+				if (cellValue.equals("-------------------------------------------------------------------------------------------------")) {
 					if (instructor != null) {
 						instructorSet.add(instructor);
 					}
@@ -52,6 +56,10 @@ public class ImportInstructors {
 
 				// Populate Instructor object
 				if (instructor != null) {
+//					System.out.println("Content of parts[2]" + "'" + parts[2]+ "'");
+					if (parts[2] == "") {
+						break;
+					}
 					switch (rowCount) {
 					case 1:
 						parseRow1(instructor, parts);
@@ -90,10 +98,20 @@ public class ImportInstructors {
 		instructor.setId(parts[0]);
 		String[] nameParts = parts[1].split(", ");
 		String lastName = nameParts[0];
+//		String firstName = nameParts[1];
+		
+//		System.out.println(nameParts.length + " Loop : " + count);
+//		count++;
+		
 		String[] firstAndMiddle = nameParts[1].split(" ");
 		String firstName = firstAndMiddle[0];
-		char middleInitial = (firstAndMiddle.length > 1) ? firstAndMiddle[1].charAt(0) : '\0'; // '\0' represents an
-		instructor.setName(new Name(lastName, firstName, middleInitial));
+		if (firstAndMiddle.length == 2) {
+			char middleInitial = (firstAndMiddle.length > 1) ? firstAndMiddle[1].charAt(0) : '\0'; // '\0' represents an
+			instructor.setName(new Name(lastName, firstName, middleInitial));
+		} else {
+			instructor.setName(new Name(lastName, firstName));
+		}
+
 //		instructor.setHomePhone(parts[2]); //Make contactInfo class
 		instructor.setRank(parts[3]);
 		instructor.setCertifiedOnline(parts[4]);
@@ -126,10 +144,27 @@ public class ImportInstructors {
 //		instructor.setBusPhone(parts[0]);	  //Make contactInfo class
 //		instructor.setCityStateZip(parts[1]); //Make contactInfo class
 		instructor.setCertifiedCourses(parts[2]);
+		instructor.setCertifiedCourses(parts[3]);
+		instructor.setCertifiedCourses(parts[4]);
+		instructor.setCertifiedCourses(parts[5]);
+		instructor.setCertifiedCourses(parts[6]);
+		instructor.setCertifiedCourses(parts[7]);
+		instructor.setCertifiedCourses(parts[8]);
+		instructor.setCertifiedCourses(parts[9]);
+		instructor.setCertifiedCourses(parts[10]);
+		
 	}
 
 	private static void parseRow4(Instructor instructor, String[] parts) {
 		instructor.setCertifiedCourses(parts[2]);
+		instructor.setCertifiedCourses(parts[3]);
+		instructor.setCertifiedCourses(parts[4]);
+		instructor.setCertifiedCourses(parts[5]);
+		instructor.setCertifiedCourses(parts[6]);
+		instructor.setCertifiedCourses(parts[7]);
+		instructor.setCertifiedCourses(parts[8]);
+		instructor.setCertifiedCourses(parts[9]);
+		instructor.setCertifiedCourses(parts[10]);
 	}
 
 	// I can probably find a way to combine all of my parse availability methods now
