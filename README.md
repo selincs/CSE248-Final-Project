@@ -7,4 +7,4 @@ With JavaFX, a user may use the MenuBar to select their .xlsx file from the Proj
 
 Courses objects and Section objects have been added, along with respective sets to contain each object. CourseSet is a static object that contains all courses of college, each course containing a section set with sections created for each individual instances of a course with appropriate data included during the semester. Introduced new organization of packages, alongside appropriate converters to ensure data is stored properly. More converters to come, and CSVtoXLSX converter is not yet in use. Course and section data is currently processed via CourseDemo.java.
 
-#https://www.markdownguide.org/cheat-sheet/
+## https://www.markdownguide.org/cheat-sheet/
